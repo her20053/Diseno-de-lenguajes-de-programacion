@@ -1,5 +1,27 @@
-
 def convertirAPostfix(expresion):
+    # Validar que la expresión no esté vacía
+    if not expresion:
+        raise ValueError("La expresión está vacía")
+
+    # Validar que la expresión no comience ni termine con un operador
+    operadores = set(["|", "*", '.'])
+    if expresion[0] in operadores:
+        raise ValueError(
+            "La expresión no puede comenzar o terminar con un operador")
+
+    # Validar que no haya paréntesis sin cerrar o sin abrir
+    stack = []
+    for c in expresion:
+        if c == "(":
+            stack.append(c)
+        elif c == ")":
+            if not stack:
+                raise ValueError("La expresión tiene un paréntesis sin abrir")
+            stack.pop()
+    if stack:
+        raise ValueError("La expresión tiene un paréntesis sin cerrar")
+
+    # Convertir la expresión de infix a postfix
     precedence = {"|": 1, ".": 2, "*": 3}
     stack = []
     postfix = []
