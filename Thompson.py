@@ -288,12 +288,12 @@ class Thompson:
         # Creamos la transicion vacia del estado inicial al primer AFN
 
         transicionTemporal1 = Transicion(
-            estadoInicial, afn1.transiciones[0].origen, 'e')
+            estadoInicial, afn1.transiciones[0].origen, 'ε')
 
         # Creamos la transicion vacia del estado inicial al segundo AFN
 
         transicionTemporal2 = Transicion(
-            estadoInicial, afn2.transiciones[0].origen, 'e')
+            estadoInicial, afn2.transiciones[0].origen, 'ε')
 
         # Agregamos las transiciones al AFN final
 
@@ -335,11 +335,11 @@ class Thompson:
 
         # Creamos la transicion vacia del ultimo estado del primer AFN al estado final
 
-        transicionTemporal1 = Transicion(ultimoEstadoAFN1, estadoFinal, 'e')
+        transicionTemporal1 = Transicion(ultimoEstadoAFN1, estadoFinal, 'ε')
 
         # Creamos la transicion vacia del ultimo estado del segundo AFN al estado final
 
-        transicionTemporal2 = Transicion(ultimoEstadoAFN2, estadoFinal, 'e')
+        transicionTemporal2 = Transicion(ultimoEstadoAFN2, estadoFinal, 'ε')
 
         # Agregamos las transiciones al AFN final
 
@@ -383,12 +383,12 @@ class Thompson:
         # Creamos la transicion vacia del estado inicial al estado final
 
         transicionEstadoInicialAFinal = Transicion(
-            estadoInicial, estadoFinal, 'e')
+            estadoInicial, estadoFinal, 'ε')
 
         # Creamos la transicion vacia desde el estado inicial al primer del AFN
 
         transicionEstadoInicialAIncialAFN = Transicion(
-            estadoInicial, afn.transiciones[0].origen, 'e')
+            estadoInicial, afn.transiciones[0].origen, 'ε')
 
         # Agregamos las transiciones al AFN final
 
@@ -403,7 +403,7 @@ class Thompson:
         # Creamos la transicion vacia desde el ultimo estado del AFN al estado final
 
         transicionEstadoUltimoAFNAFinal = Transicion(
-            afn.transiciones[-1].destino, estadoFinal, 'e')
+            afn.transiciones[-1].destino, estadoFinal, 'ε')
 
         # Agregamos la transicion al AFN final
 
@@ -412,7 +412,7 @@ class Thompson:
         # Creamos la transicion vacia desde el ultimo estado del AFN al primer estado del AFN
 
         transicionEstadoUltimoAPrimero = Transicion(
-            afn.transiciones[-1].destino, afn.transiciones[0].origen, 'e')
+            afn.transiciones[-1].destino, afn.transiciones[0].origen, 'ε')
 
         # Agregamos la transicion al AFN final
 
