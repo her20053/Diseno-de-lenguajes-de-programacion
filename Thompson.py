@@ -141,12 +141,12 @@ class Thompson:
             if estado == self.estadoAceptacion:
 
                 session.run(
-                    f'CREATE (n:Node {{name: "{estado}", aceptacion: true}})')
+                    f'CREATE (n:NodeA {{name: "{estado}", aceptacion: true}})')
 
             elif estado == self.estadoInicial:
 
                 session.run(
-                    f'CREATE (n:Node {{name: "{estado}", inicial: true}})')
+                    f'CREATE (n:NodeI {{name: "{estado}", inicial: true}})')
 
             else:
                 session.run(f'CREATE (n:Node {{name: "{estado}"}})')
@@ -159,17 +159,30 @@ class Thompson:
             segundoNodo = transicion.destino
             simbolo = transicion.simbolo
 
-            session.run(f''' 
-                MATCH (n1:Node {{name: "{primerNodo}"}})
-                MATCH (n2:Node {{name: "{segundoNodo}"}})
-                CREATE (n1)-[:{simbolo}]->(n2)
-                ''')
+            if primerNodo == self.estadoInicial:
 
-        # Almacenamos el resultado de la consulta
-        result = session.run("MATCH p=()-[:b|e|a]->() RETURN p")
+                session.run(f''' 
+                    MATCH (n1:NodeI {{name: "{primerNodo}"}})
+                    MATCH (n2:Node {{name: "{segundoNodo}"}})
+                    CREATE (n1)-[:{simbolo}]->(n2)
+                    ''')
 
-        print()
-        print("Grafo creado con exito")
+            elif segundoNodo == self.estadoAceptacion:
+
+                session.run(f''' 
+                    MATCH (n1:Node {{name: "{primerNodo}"}})
+                    MATCH (n2:NodeA {{name: "{segundoNodo}"}})
+                    CREATE (n1)-[:{simbolo}]->(n2)
+                    ''')
+
+            else:
+                session.run(f''' 
+                    MATCH (n1:Node {{name: "{primerNodo}"}})
+                    MATCH (n2:Node {{name: "{segundoNodo}"}})
+                    CREATE (n1)-[:{simbolo}]->(n2)
+                    ''')
+
+        print("\nGrafo creado con exito\n")
 
         session.close()
 
