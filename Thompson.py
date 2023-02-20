@@ -166,34 +166,6 @@ class Thompson:
 
         session.close()
 
-    def guardarImagenAFN(self):
-
-        from py2neo import Graph
-        from py2neo.data import Node, Relationship
-        from pydot import Dot, Node as pydotNode, Edge
-
-        # Connect to the Neo4j database
-        graph = Graph("neo4j+ssc://96c06d72.databases.neo4j.io",
-                      auth=("neo4j", "ILxqsaeqWbPY4PMQkzTjoxL0nYYbip7wCsJcyRDNfx4"))
-
-        results = graph.run("MATCH p=()-[:b|e|a]->() RETURN p LIMIT 25")
-
-        dot = Dot()
-
-        for record in results:
-            for segment in record['p'].segments:
-                start_node = segment.start_node
-                end_node = segment.end_node
-                rel = segment.relationship
-                dot.add_node(pydotNode(str(start_node.identity),
-                             label=str(start_node.properties)))
-                dot.add_node(pydotNode(str(end_node.identity),
-                             label=str(end_node.properties)))
-                dot.add_edge(Edge(str(start_node.identity), str(
-                    end_node.identity), label=rel.type))
-
-        dot.write_png('afn.png')
-
     # Metodo que se encarga de verificar si un caracter es un operador
 
     def esOperador(self, caracter):

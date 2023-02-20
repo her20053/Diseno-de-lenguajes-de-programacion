@@ -1,9 +1,7 @@
 from Thompson import Thompson
+from toPostfix import convertirAPostfix
 
-postfix = 'ab.'
-postfix = 'ab|*a.b.b.'
-postfix = 'aa.ab|*.ba|.b.b.b.'
+expresionRegular = "a.b.b.c*.(a|b)*"
+expresionRegular = "a.b.c*"
 
-thompson = Thompson(postfix)
-
-thompson.crearGrafoNeo4J()
+thompson = Thompson(convertirAPostfix(expresionRegular)).crearGrafoNeo4J()
