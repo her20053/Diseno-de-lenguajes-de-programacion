@@ -3,14 +3,17 @@ import string
 
 class AFN:
 
+    # Metodo constructor de la clase AFN, inicializa la lista de transiciones vacia
     def __init__(self):
 
         self.transiciones = []
 
+    # Metodo encargado de agregar una transicion al AFN
     def agregarTransicion(self, transicion):
 
         self.transiciones.append(transicion)
 
+    # Metodo encargado de obtener los caracteres/valores de transicion del AFN
     def obtenerCaracteres(self):
 
         listaCaracteres = []
@@ -23,6 +26,7 @@ class AFN:
 
         return listaCaracteres
 
+    # Metodo encargado de transformar el AFN a un string
     def __str__(self):
 
         resultado = "\nAFN: \n"
@@ -35,11 +39,14 @@ class AFN:
 
 
 class Transicion:
+
+    # Metodo constructor de la clase Transicion, recibe como parametros el estado de origen, el estado de destino y el simbolo/transicion
     def __init__(self, origen, destino, simbolo):
         self.origen = origen
         self.destino = destino
         self.simbolo = simbolo
 
+    # Metodo encargado de transformar la transicion a un string
     def __str__(self):
         return f"[Transicion ({self.origen}, {self.simbolo}, {self.destino})]"
 
