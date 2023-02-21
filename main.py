@@ -1,10 +1,6 @@
 from Thompson import Thompson
 from toPostfix import convertirAPostfix, formatearExpresionRegular
 
-# expresionRegular = "a.(b*|a).b?.c+.(a|b)*"
-# expresionRegular = "((a|b)*)?.c+"
-# expresionRegular = "a?.(b?)?.a*"
-
 listaExpresiones = [
     "a+",
     "a(a|b)*b",
@@ -17,10 +13,9 @@ listaExpresiones = [
     "a?(b?)?a*"
 ]
 
-for expresion in listaExpresiones:
 
-    print("\nPara la expresion", expresion, " es: \n",
-          formatearExpresionRegular(expresion) + "\n")
-
-
-# thompson = Thompson(convertirAPostfix(expresionRegular)).crearGrafoNeo4J()
+thompson = Thompson(
+    convertirAPostfix(
+        formatearExpresionRegular(listaExpresiones[6])
+    )
+).crearGrafoNeo4J()
