@@ -1,3 +1,34 @@
+def formatearExpresionRegular(expresion):
+
+    respuesta = ''
+
+    todosOperadores = set(["|", "*", "+", "?"])
+
+    operadoresBinarios = set(["|"])
+
+    for i in range(len(expresion)):
+
+        caracter = expresion[i]
+
+        if i + 1 < len(expresion):
+
+            siguienteCaracter = expresion[i + 1]
+
+            respuesta += caracter
+
+            if caracter != '(':
+
+                if siguienteCaracter != ')':
+
+                    if siguienteCaracter not in todosOperadores:
+
+                        if caracter not in operadoresBinarios:
+
+                            respuesta += '.'
+
+    return respuesta + expresion[-1]
+
+
 def convertirAPostfix(expresion):
     # Validar que la expresión no esté vacía
     if not expresion:
