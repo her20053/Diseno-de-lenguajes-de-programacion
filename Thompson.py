@@ -190,13 +190,13 @@ class Thompson:
 
     def esOperador(self, caracter):
 
-        return caracter == '*' or caracter == '.' or caracter == '|' or caracter == '+'
+        return caracter == '*' or caracter == '.' or caracter == '|' or caracter == '+' or caracter == '?'
 
     # Metodo que se encarga de verificar si un operador es binario o unario
 
     def esBinario(self, caracter):
 
-        return caracter == '.' or caracter == '|' or caracter == '+'
+        return caracter == '.' or caracter == '|'
 
     # Regla 1: Simbolo, esta regla se encarga de generar un AFN que solo acepta un simbolo
     # Ejemplo: a
@@ -424,6 +424,108 @@ class Thompson:
 
         return afnFinal
 
+    # Regla 5: Cerradura Positiva, esta regla se encarga de generar un AFN que acepta la cerradura positiva de un AFN
+    def reglaPositiva(self, afn):
+
+        afnTemporal = AFN()
+
+        # Para implementar la cerradura positiva en el algoritmo de Thompson, se puede seguir los siguientes pasos:
+
+        # 1 Crear dos nodos nuevos, start y end, que representan el inicio y el fin del autómata.
+
+        # Creamos el estado inicial
+
+        estadoInicial = self.cantidadEstadosGenerados
+
+        self.cantidadEstadosGenerados += 1
+
+        # Creamos el estado final
+
+        estadoFinal = self.cantidadEstadosGenerados
+
+        self.cantidadEstadosGenerados += 1
+
+        # 2 Crear un nuevo nodo n1 y conectarlo con una transición epsilon (ε) al nodo start.
+
+        transicion1 = Transicion(
+            estadoInicial, afn.transiciones[0].origen, 'ε')
+        afnTemporal.agregarTransicion(transicion1)
+
+        # 3 Crear otro nuevo nodo n2 y conectarlo con una transición epsilon (ε) al nodo n1.
+
+        transicion2 = Transicion(
+            afn.transiciones[-1].destino, afn.transiciones[0].origen, 'ε')
+        afnTemporal.agregarTransicion(transicion2)
+
+        # 4 Agregar una transición con el símbolo deseado (por ejemplo, a) desde el nodo n1 al nodo n2.
+
+        for transicion in afn.transiciones:
+
+            afnTemporal.agregarTransicion(transicion)
+
+        # 5 Conectar el nodo n2 con una transición epsilon (ε) al nodo end.
+
+        transicion3 = Transicion(
+            afn.transiciones[-1].destino, estadoFinal, 'ε')
+        afnTemporal.agregarTransicion(transicion3)
+
+        return afnTemporal
+
+    # Regla 6: Opcional(?), esta regla se encarga de generar un AFN que acepta la opcion de un AFN
+
+    def reglaOpcional(self, afn):
+
+        afnFinal = AFN()
+
+        # Creamos 4 nuevos estados
+
+        estado1 = self.cantidadEstadosGenerados
+        self.cantidadEstadosGenerados += 1
+
+        estado2 = self.cantidadEstadosGenerados
+        self.cantidadEstadosGenerados += 1
+
+        estado3 = self.cantidadEstadosGenerados
+        self.cantidadEstadosGenerados += 1
+
+        estado4 = self.cantidadEstadosGenerados
+        self.cantidadEstadosGenerados += 1
+
+        # Creamos una transicion vacia desde el estado 2 al estado 3
+
+        transicionConEpsilum2A3 = Transicion(estado2, estado3, 'ε')
+
+        # Creamos una transicion vacia desde el estado 1 al estado 2
+
+        transicionConEpsilum1A2 = Transicion(estado1, estado2, 'ε')
+
+        # Creamos una transicion vacia desde el estado 3 al estado 4
+
+        transicionConEpsilum3A4 = Transicion(estado3, estado4, 'ε')
+
+        # Creamos una trasicion vacia desde el estado 1 al primer estado del AFN
+
+        transicionConEpsilum1APrimeroAFN = Transicion(
+            estado1, afn.transiciones[0].origen, 'ε')
+
+        # Creamos una transicion vacia desde el ultimo estado del AFN al estado 4
+
+        transicionConEpsilumUltimoAFNA4 = Transicion(
+            afn.transiciones[-1].destino, estado4, 'ε')
+
+        # Empezamos a agregar todas las transiciones al AFN final
+
+        afnFinal.agregarTransicion(transicionConEpsilum1A2)
+        afnFinal.agregarTransicion(transicionConEpsilum2A3)
+        afnFinal.agregarTransicion(transicionConEpsilum3A4)
+        afnFinal.agregarTransicion(transicionConEpsilum1APrimeroAFN)
+        for transicion in afn.transiciones:
+            afnFinal.agregarTransicion(transicion)
+        afnFinal.agregarTransicion(transicionConEpsilumUltimoAFNA4)
+
+        # Regresamos el AFN final
+        return afnFinal
+
     # Generacion de AFN: Se encarga de generar un AFN a partir de una expresion regular en notacion posfija
     # Ejemplo: ab.
     # AFN: estado 0 -> a -> estado 1 -> b -> estado 2
@@ -479,15 +581,36 @@ class Thompson:
 
                 else:
 
-                    # Extraemos el ultimo AFN del stack
+                    if caracter == "*":
+                        # Extraemos el ultimo AFN del stack
 
-                    afnTemporal = stack.pop()
+                        afnTemporal = stack.pop()
 
-                    # Regla 4: Kleen
+                        # Regla 4: Kleen
 
-                    afnTemporal = self.reglaKleene(afnTemporal)
+                        afnTemporal = self.reglaKleene(afnTemporal)
 
-                    stack.append(afnTemporal)
+                        stack.append(afnTemporal)
+
+                    elif caracter == "+":
+
+                        afnTemporal = stack.pop()
+
+                        # Regla 5: Cerradura Positiva
+
+                        afnTemporal = self.reglaPositiva(afnTemporal)
+
+                        stack.append(afnTemporal)
+
+                    elif caracter == "?":
+
+                        afnTemporal = stack.pop()
+
+                        # Regla 6: Opcional
+
+                        afnTemporal = self.reglaOpcional(afnTemporal)
+
+                        stack.append(afnTemporal)
 
         # Retornamos el AFN final
 
