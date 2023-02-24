@@ -159,6 +159,10 @@ class Thompson:
             segundoNodo = transicion.destino
             simbolo = transicion.simbolo
 
+            if simbolo.isdigit():
+
+                simbolo = 'N' + str(simbolo)
+
             if primerNodo == self.estadoInicial:
 
                 session.run(f''' 

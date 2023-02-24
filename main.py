@@ -10,12 +10,13 @@ listaExpresiones = [
     "aa(a|b)+(b|a)bbb",
     "a(b*|a)b?c+(a|b)*",
     "((a|b)*)?c+",
-    "a?(b?)?a*"
+    "a?(b?)?a+",
+    "0?(1?)?0+"
 ]
 
 
 thompson = Thompson(
     convertirAPostfix(
-        formatearExpresionRegular(listaExpresiones[6])
+        formatearExpresionRegular(listaExpresiones[-1])
     )
 ).crearGrafoNeo4J()
