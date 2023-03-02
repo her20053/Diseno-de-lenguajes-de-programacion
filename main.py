@@ -1,11 +1,12 @@
 from Thompson import Thompson
-from toPostfix import convertirAPostfix, formatearExpresionRegular
+from Subconjuntos import Subconjuntos
+from Postfix import convertirAPostfix, formatearExpresionRegular
 
 listaExpresiones = [
+    "(a|b)*abb",
     "a+",
     "a(a|b)*b",
     "0?(1?)?0",
-    "(a|b)*abb",
     "a(b*|a)bc*(a|b)*",
     "aa(a|b)+(b|a)bbb",
     "a(b*|a)b?c+(a|b)*",
@@ -14,9 +15,25 @@ listaExpresiones = [
     "0?(1?)?0+"
 ]
 
+# Elegimos una expresion regular de la lista
 
-thompson = Thompson(
-    convertirAPostfix(
-        formatearExpresionRegular(listaExpresiones[-1])
-    )
-).crearGrafoNeo4J()
+regex = listaExpresiones[2]
+
+# Formateamos la expresion regular para que sea valida
+
+regex = formatearExpresionRegular(regex)
+
+# Convertimos la expresion regular de infix a postfix
+
+regex = convertirAPostfix(regex)
+
+# Creamos el automata finito no determinista utilizando Thompson, posteriormente lo convertimos a grafo con Neo4J
+
+AFN_Thompson = Thompson(regex).afn
+
+# Creamos el automata finito determinista utilizando Subconjuntos
+
+AFD_Subconjuntos = Subconjuntos(AFN_Thompson).afd
+
+AFD_Subconjuntos.mostrarTablaAFD()
+AFD_Subconjuntos.crearGrafoNeo4j()

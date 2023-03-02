@@ -20,11 +20,17 @@ class AFN:
 
         for transicion in self.transiciones:
 
-            if transicion.simbolo not in listaCaracteres:
+            if transicion.simbolo not in listaCaracteres and transicion.simbolo != "ε":
 
                 listaCaracteres.append(transicion.simbolo)
 
         return listaCaracteres
+
+    def getEstadoInicial(self):
+
+        # El estado inicial de N es el primer estado de la lista de transiciones
+
+        return self.transiciones[0].origen
 
     # Metodo encargado de transformar el AFN a un string
     def __str__(self):
@@ -189,6 +195,8 @@ class Thompson:
         print("\nGrafo creado con exito\n")
 
         session.close()
+
+        return self.afn
 
     # Metodo que se encarga de verificar si un caracter es un operador
 
