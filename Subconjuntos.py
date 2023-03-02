@@ -47,140 +47,6 @@ class AFD:
 
         print(tabulate(contenidoTabla, headersTabla, tablefmt="grid"))
 
-    def crearGrafoNeo4j(self):
-
-        from neo4j import GraphDatabase
-
-        grafo = GraphDatabase.driver(
-            uri="neo4j+ssc://96c06d72.databases.neo4j.io", auth=("neo4j", "ILxqsaeqWbPY4PMQkzTjoxL0nYYbip7wCsJcyRDNfx4"))
-
-        session = grafo.session()
-
-        session.run('MATCH (n) DETACH DELETE n')
-
-        # +-------------+-------------------------------------+------------------+--------------------+--------------------+
-        # | Primitivo   | Conjunto de estados AFN             | Estado del AFD   | Transicion con a   | Transicion con b   |
-        # +=============+=====================================+==================+====================+====================+
-        # | ['A']       | ['A']                               | A                | ['B']              | []                 |
-        # +-------------+-------------------------------------+------------------+--------------------+--------------------+
-        # | []          | []                                  | E                | []                 | []                 |
-        # +-------------+-------------------------------------+------------------+--------------------+--------------------+
-        # | ['B']       | ['B', 'C', 'D', 'E', 'I']           | B                | ['F']              | ['G', 'J']         |
-        # +-------------+-------------------------------------+------------------+--------------------+--------------------+
-        # | ['F']       | ['C', 'D', 'E', 'F', 'H', 'I']      | C                | ['F']              | ['G', 'J']         |
-        # +-------------+-------------------------------------+------------------+--------------------+--------------------+
-        # | ['G', 'J']  | ['C', 'D', 'E', 'G', 'H', 'I', 'J'] | D                | ['F']              | ['G', 'J']         |
-        # +-------------+-------------------------------------+------------------+--------------------+--------------------+
-
-        listaEstadosAcepatcion = []
-        listaEstadosIniciales = []
-
-        # Estados de aceptacion:  ['D']
-        # Estados iniciales:  ['A']
-
-        for fila in self.afd:
-
-            estadosEpsilum = fila.conjuntoDeEstadosAFN
-
-            # Revisamos si contiene al estado de aceptacion el conjunto de estados AFN, si lo contiene, entonces creamos un Nodo de aceptacion en Neo4J
-
-            if self.afn.transiciones[-1].destino in estadosEpsilum:
-
-                session.run(
-                    f'CREATE (n:NodeA {{name: "{fila.estadoDelAFD}", aceptacion: true}})')
-
-                listaEstadosAcepatcion.append(fila.estadoDelAFD)
-
-            elif self.afn.transiciones[0].origen in estadosEpsilum:
-
-                session.run(
-                    f'CREATE (n:NodeI {{name: "{fila.estadoDelAFD}", inicial: true}})')
-
-                listaEstadosIniciales.append(fila.estadoDelAFD)
-
-            else:
-
-                session.run(f'CREATE (n:Node {{name: "{fila.estadoDelAFD}"}})')
-
-        print("Estados de aceptacion: ", listaEstadosAcepatcion)
-        print("Estados iniciales: ", listaEstadosIniciales)
-
-        # Creamos las relaciones entre los nodos
-
-        for fila in self.afd:
-
-            # +-------------+-------------------------------------+------------------+--------------------+--------------------+
-            # | Primitivo   | Conjunto de estados AFN             | Estado del AFD   | Transicion con a   | Transicion con b   |
-            # +=============+=====================================+==================+====================+====================+
-            # | ['A']       | ['A']                               | A                | ['B']              | []                 |
-            # +-------------+-------------------------------------+------------------+--------------------+--------------------+
-
-            # Estados de aceptacion:  ['D']
-            # Estados iniciales:  ['A']
-
-            # Tenemos que crear una relacion entre el nodo A y el nodo B, con el simbolo a
-
-            for keySimbolo, valuePrimitivo in fila.transiciones.items():
-
-                NodoInicio = fila.estadoDelAFD
-
-                for fila2 in self.afd:
-
-                    if fila2.primitivo == valuePrimitivo:
-
-                        NodoFin = fila2.estadoDelAFD
-
-                        # Ahora revisamos si el nodo de inicio es un estado de aceptacion o inicial o ninguno de los dos
-
-                        if NodoInicio in listaEstadosAcepatcion and NodoFin in listaEstadosAcepatcion:
-
-                            session.run(
-                                f''' MATCH (n1:NodeA {{name: "{NodoInicio}"}}) MATCH (n2:NodeA {{name: "{NodoFin}"}}) CREATE (n1)-[:{keySimbolo}]->(n2) ''')
-
-                        elif NodoInicio in listaEstadosAcepatcion and NodoFin in listaEstadosIniciales:
-
-                            session.run(
-                                f''' MATCH (n1:NodeA {{name: "{NodoInicio}"}}) MATCH (n2:NodeI {{name: "{NodoFin}"}}) CREATE (n1)-[:{keySimbolo}]->(n2) ''')
-
-                        elif NodoInicio in listaEstadosIniciales and NodoFin in listaEstadosAcepatcion:
-
-                            session.run(
-                                f''' MATCH (n1:NodeI {{name: "{NodoInicio}"}}) MATCH (n2:NodeA {{name: "{NodoFin}"}}) CREATE (n1)-[:{keySimbolo}]->(n2) ''')
-
-                        elif NodoInicio in listaEstadosIniciales and NodoFin in listaEstadosIniciales:
-
-                            session.run(
-                                f''' MATCH (n1:NodeI {{name: "{NodoInicio}"}}) MATCH (n2:NodeI {{name: "{NodoFin}"}}) CREATE (n1)-[:{keySimbolo}]->(n2) ''')
-
-                        elif NodoInicio not in listaEstadosAcepatcion and NodoFin not in listaEstadosIniciales:
-
-                            session.run(
-                                f''' MATCH (n1:Node {{name: "{NodoInicio}"}}) MATCH (n2:Node {{name: "{NodoFin}"}}) CREATE (n1)-[:{keySimbolo}]->(n2) ''')
-
-                        elif NodoInicio not in listaEstadosAcepatcion and NodoFin in listaEstadosAcepatcion:
-
-                            session.run(
-                                f''' MATCH (n1:Node {{name: "{NodoInicio}"}}) MATCH (n2:NodeA {{name: "{NodoFin}"}}) CREATE (n1)-[:{keySimbolo}]->(n2) ''')
-
-                        elif NodoInicio not in listaEstadosAcepatcion and NodoFin in listaEstadosIniciales:
-
-                            session.run(
-                                f''' MATCH (n1:Node {{name: "{NodoInicio}"}}) MATCH (n2:NodeI {{name: "{NodoFin}"}}) CREATE (n1)-[:{keySimbolo}]->(n2) ''')
-
-                        elif NodoInicio in listaEstadosAcepatcion and NodoFin not in listaEstadosIniciales:
-
-                            session.run(
-                                f''' MATCH (n1:NodeA {{name: "{NodoInicio}"}}) MATCH (n2:Node {{name: "{NodoFin}"}}) CREATE (n1)-[:{keySimbolo}]->(n2) ''')
-
-                        elif NodoInicio in listaEstadosIniciales and NodoFin not in listaEstadosAcepatcion:
-
-                            session.run(
-                                f''' MATCH (n1:NodeI {{name: "{NodoInicio}"}}) MATCH (n2:Node {{name: "{NodoFin}"}}) CREATE (n1)-[:{keySimbolo}]->(n2) ''')
-
-        print("\nGrafo creado con exito\n")
-
-        session.close()
-
 
 class FilaTablaD:
 
@@ -270,22 +136,18 @@ class Subconjuntos:
         return posiblesEstados
 
     def cerraduraEpsilon(self, estado):
+        pilaEstados = [estado]
+        listaEstados = [estado]
 
-        # Tenemos que revisar todos los estados al que el estado actual puede llegar con un epsilon
+        while len(pilaEstados) > 0:
+            estadoActual = pilaEstados.pop()
 
-        listaEstados = []
+            for transicion in self.afn.transiciones:
+                if transicion.simbolo == "ε" and transicion.origen == estadoActual and transicion.destino not in listaEstados:
+                    listaEstados.append(transicion.destino)
+                    pilaEstados.append(transicion.destino)
 
-        listaEstados.append(estado)
-
-        for transicion in self.afn.transiciones:
-
-            if transicion.origen == estado and transicion.simbolo == "ε":
-
-                listaEstados.append(transicion.destino)
-
-                listaEstados += self.cerraduraEpsilon(transicion.destino)
-
-        return list(set(listaEstados))
+        return listaEstados
 
     def generarAFD(self, primitivos):
 
