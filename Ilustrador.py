@@ -123,6 +123,43 @@ class Ilustrador:
 
         session.close()
 
-    def dibujarAFN():
+    def IlustrarArbolPostOrder(arbol, padre_nui=None):
 
-        pass
+        # Conexión a la base de datos de Neo4j
+        uri = "neo4j+ssc://96c06d72.databases.neo4j.io"
+        driver = GraphDatabase.driver(uri, auth=(
+            "neo4j", "ILxqsaeqWbPY4PMQkzTjoxL0nYYbip7wCsJcyRDNfx4"))
+
+        with driver.session() as session:
+            session.run('MATCH (n) DETACH DELETE n')
+
+        def dibujarNodo(arbol, padre_nui=None):
+
+            with driver.session() as session:
+
+                # Creamos el nodo actual
+
+                session.run(
+                    f'CREATE (n:Node {{name: "{arbol.valor}", NUI: "{arbol.numeroUnicoIdentificacion}"}})')
+
+                # Creamos la relación con el nodo padre, si existe
+
+                if padre_nui is not None:
+                    session.run(
+                        f'MATCH (p:Node {{NUI: "{padre_nui}"}}), (c:Node {{NUI: "{arbol.numeroUnicoIdentificacion}"}}) CREATE (p)-[:CHILD]->(c)')
+
+                # Creamos las relaciones con los nodos hijos, si existen
+
+                if arbol.izquierda is not None:
+                    dibujarNodo(
+                        arbol.izquierda, arbol.numeroUnicoIdentificacion)
+
+                if arbol.derecha is not None:
+                    dibujarNodo(
+                        arbol.derecha, arbol.numeroUnicoIdentificacion)
+
+        dibujarNodo(arbol, padre_nui=None)
+
+        print("\nArbol creado con exito\n")
+
+        return

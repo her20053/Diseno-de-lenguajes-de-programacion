@@ -1,6 +1,7 @@
+from Directo import Directo
 from Thompson import Thompson
-from Subconjuntos import Subconjuntos
 from Ilustrador import Ilustrador
+from Subconjuntos import Subconjuntos
 from Postfix import convertirAPostfix, formatearExpresionRegular
 
 listaExpresiones = [
@@ -61,9 +62,34 @@ def crearAFDdesdeAFN(expresion, mostrarPrimitivos=False):
     Ilustrador.dibujarAFD(AFD_Subconjuntos, mostrarPrimitivos)
 
 
+def crearAFDmetodoDirecto(expresion):
+
+    def expandirRegex(regex):
+
+        return regex + "#."
+
+    # Formateamos la expresion regular para que sea valida
+
+    regex = formatearExpresionRegular(expresion)
+
+    # Convertimos la expresion regular de infix a postfix
+
+    regex = convertirAPostfix(regex)
+
+    regexExpandida = expandirRegex(regex)
+
+    directo = Directo(expresionRegularExpandida=regexExpandida)
+
+    afd = directo.afd
+
+    arbol = directo.arbol
+
+    Ilustrador.IlustrarArbolPostOrder(arbol, arbol.numeroUnicoIdentificacion)
+
+
 if __name__ == "__main__":
 
-    expresionAUtilizar = listaExpresiones[-5]
+    expresionAUtilizar = listaExpresiones[3]
 
     # Crear un AFN utilizando Thompson e ilustrarlo con Neo4J:
 
@@ -71,4 +97,12 @@ if __name__ == "__main__":
 
     # Crear un AFD utilizando Thompson luego utilizando Subconjuntos e ilustrarlo con Neo4J:
 
-    crearAFDdesdeAFN(expresionAUtilizar)
+    # crearAFDdesdeAFN(expresionAUtilizar)
+
+    # Crear un AFD utilizando el metodo directo e ilustrarlo con Neo4J:
+
+    # for ex in listaExpresiones:
+
+    #     crearAFDmetodoDirecto(ex)
+
+    crearAFDmetodoDirecto(expresionAUtilizar)
