@@ -23,6 +23,10 @@ class AFD:
 
         headersTabla.append("Estado del AFD")
 
+        headersTabla.append("Aceptacion")
+
+        headersTabla.append("Inicial")
+
         for fila in self.afd:
 
             temporal = []
@@ -32,6 +36,10 @@ class AFD:
             temporal.append(fila.conjuntoDeEstadosAFN)
 
             temporal.append(fila.estadoDelAFD)
+
+            temporal.append(fila.estadoAceptacion)
+
+            temporal.append(fila.estadoInicial)
 
             for k, v in fila.transiciones.items():
 
@@ -60,6 +68,10 @@ class FilaTablaD:
 
         self.transiciones = {}
 
+        self.estadoAceptacion = False
+
+        self.estadoInicial = False
+
     def agregarTransicion(self, simboloTransicion, estadoDestino):
 
         self.transiciones[simboloTransicion] = estadoDestino
@@ -85,6 +97,14 @@ class FilaTablaD:
         tablaTemporal.append(self.estadoDelAFD)
 
         headersTabla.append("Estado del AFD")
+
+        tablaTemporal.append([self.estadoAceptacion])
+
+        headersTabla.append("Aceptacion")
+
+        tablaTemporal.append([self.estadoInicial])
+
+        headersTabla.append("Inicial")
 
         for k, v in self.transiciones.items():
 
@@ -149,6 +169,30 @@ class Subconjuntos:
 
         return listaEstados
 
+    def revisarSiEstadoEsAceptacion(self, estadosEpsiliado):
+
+        # print("Revisando si es aceptacion")
+
+        # print(self.afn.transiciones[-1].destino, estadosEpsiliado)
+
+        if self.afn.transiciones[-1].destino in estadosEpsiliado:
+
+            return True
+
+        return False
+
+    def revisarSiEstadoEsInicial(self, estadosEpsiliados):
+
+        # print("Revizando si es inicial")
+
+        # print(self.afn.transiciones[0].origen, estadosEpsiliados)
+
+        if self.afn.transiciones[0].origen in estadosEpsiliados:
+
+            return True
+
+        return False
+
     def generarAFD(self, primitivos):
 
         if primitivos in self.listaEstadosGenerados:
@@ -172,6 +216,11 @@ class Subconjuntos:
 
         filaTemporal = FilaTablaD(
             primitivos, cerradurasEpsiliadasTotales, EstadoDelAFD)
+
+        filaTemporal.estadoAceptacion = self.revisarSiEstadoEsAceptacion(
+            cerradurasEpsiliadasTotales)
+        filaTemporal.estadoInicial = self.revisarSiEstadoEsInicial(
+            cerradurasEpsiliadasTotales)
 
         for simbolo in self.afn.obtenerCaracteres():
 
@@ -209,6 +258,11 @@ class Subconjuntos:
 
         filaInicial = FilaTablaD(
             [estadoInicialAFN], ConjuntoEstadosAFN, EstadoDelAFD)
+
+        filaInicial.estadoAceptacion = self.revisarSiEstadoEsAceptacion(
+            ConjuntoEstadosAFN)
+        filaInicial.estadoInicial = self.revisarSiEstadoEsInicial(
+            ConjuntoEstadosAFN)
 
         for simbolo in self.afn.obtenerCaracteres():
 

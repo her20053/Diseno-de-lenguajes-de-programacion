@@ -1,5 +1,6 @@
 from Thompson import Thompson
 from Subconjuntos import Subconjuntos
+from Ilustrador import Ilustrador
 from Postfix import convertirAPostfix, formatearExpresionRegular
 
 listaExpresiones = [
@@ -17,27 +18,57 @@ listaExpresiones = [
     "(a|b)*((a|(bb)*)ε)"
 ]
 
-# Elegimos una expresion regular de la lista
 
-regex = listaExpresiones[-1]
+def crearAFNconThompson(expresion):
 
-# Formateamos la expresion regular para que sea valida
+    regex = expresion
 
-regex = formatearExpresionRegular(regex)
+    # Formateamos la expresion regular para que sea valida
 
-# Convertimos la expresion regular de infix a postfix
+    regex = formatearExpresionRegular(regex)
 
-regex = convertirAPostfix(regex)
+    # Convertimos la expresion regular de infix a postfix
 
-# Creamos el automata finito no determinista utilizando Thompson, posteriormente lo convertimos a grafo con Neo4J
+    regex = convertirAPostfix(regex)
 
-AFN_Thompson = Thompson(regex).afn
+    # Creamos el automata finito no determinista utilizando Thompson, posteriormente lo convertimos a grafo con Neo4J
 
-print(AFN_Thompson)
+    AFN_Thompson = Thompson(regex).crearGrafoNeo4J()
 
-# Creamos el automata finito determinista utilizando Subconjuntos
 
-AFD_Subconjuntos = Subconjuntos(AFN_Thompson).afd
+def crearAFDdesdeAFN(expresion, mostrarPrimitivos=False):
 
-AFD_Subconjuntos.mostrarTablaAFD()
-# AFD_Subconjuntos.crearGrafoNeo4j()
+    regex = expresion
+
+    # Formateamos la expresion regular para que sea valida
+
+    regex = formatearExpresionRegular(regex)
+
+    # Convertimos la expresion regular de infix a postfix
+
+    regex = convertirAPostfix(regex)
+
+    # Creamos el automata finito no determinista utilizando Thompson, posteriormente lo convertimos a grafo con Neo4J
+
+    AFN_Thompson = Thompson(regex).afn
+
+    # Creamos el automata finito determinista utilizando Subconjuntos
+
+    AFD_Subconjuntos = Subconjuntos(AFN_Thompson).afd
+
+    AFD_Subconjuntos.mostrarTablaAFD()
+
+    Ilustrador.dibujarAFD(AFD_Subconjuntos, mostrarPrimitivos)
+
+
+if __name__ == "__main__":
+
+    expresionAUtilizar = listaExpresiones[-5]
+
+    # Crear un AFN utilizando Thompson e ilustrarlo con Neo4J:
+
+    # crearAFNconThompson(expresionAUtilizar)
+
+    # Crear un AFD utilizando Thompson luego utilizando Subconjuntos e ilustrarlo con Neo4J:
+
+    crearAFDdesdeAFN(expresionAUtilizar)
