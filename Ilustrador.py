@@ -126,40 +126,47 @@ class Ilustrador:
     def IlustrarArbolPostOrder(arbol, padre_nui=None):
 
         # Conexión a la base de datos de Neo4j
-        uri = "neo4j+ssc://96c06d72.databases.neo4j.io"
-        driver = GraphDatabase.driver(uri, auth=(
-            "neo4j", "ILxqsaeqWbPY4PMQkzTjoxL0nYYbip7wCsJcyRDNfx4"))
+        grafo = GraphDatabase.driver(
+            uri="neo4j+ssc://96c06d72.databases.neo4j.io", auth=("neo4j", "ILxqsaeqWbPY4PMQkzTjoxL0nYYbip7wCsJcyRDNfx4"))
 
-        with driver.session() as session:
-            session.run('MATCH (n) DETACH DELETE n')
+        session = grafo.session()
+
+        session.run('MATCH (n) DETACH DELETE n')
 
         def dibujarNodo(arbol, padre_nui=None):
 
-            with driver.session() as session:
+            # Creamos el nodo actual
 
-                # Creamos el nodo actual
+            session.run(
+                f'''
+                CREATE (n:Node {{name: "{arbol.valor}", 
+                NUI: "{arbol.numeroUnicoIdentificacion}", 
+                Asignado: "{arbol.numeracionSimbolica}",
+                Anulable: "{arbol.anulable}",
+                firstPos: "{str(arbol.firstpos)}",
+                lastPos_: "{str(arbol.lastpos)}"}})
+                ''')
 
+            # Creamos la relación con el nodo padre, si existe
+
+            if padre_nui is not None:
                 session.run(
-                    f'CREATE (n:Node {{name: "{arbol.valor}", NUI: "{arbol.numeroUnicoIdentificacion}"}})')
+                    f'MATCH (p:Node {{NUI: "{padre_nui}"}}), (c:Node {{NUI: "{arbol.numeroUnicoIdentificacion}"}}) CREATE (p)-[:HIJO]->(c)')
 
-                # Creamos la relación con el nodo padre, si existe
+            # Creamos las relaciones con los nodos hijos, si existen
 
-                if padre_nui is not None:
-                    session.run(
-                        f'MATCH (p:Node {{NUI: "{padre_nui}"}}), (c:Node {{NUI: "{arbol.numeroUnicoIdentificacion}"}}) CREATE (p)-[:CHILD]->(c)')
+            if arbol.izquierda is not None:
+                dibujarNodo(
+                    arbol.izquierda, arbol.numeroUnicoIdentificacion)
 
-                # Creamos las relaciones con los nodos hijos, si existen
-
-                if arbol.izquierda is not None:
-                    dibujarNodo(
-                        arbol.izquierda, arbol.numeroUnicoIdentificacion)
-
-                if arbol.derecha is not None:
-                    dibujarNodo(
-                        arbol.derecha, arbol.numeroUnicoIdentificacion)
+            if arbol.derecha is not None:
+                dibujarNodo(
+                    arbol.derecha, arbol.numeroUnicoIdentificacion)
 
         dibujarNodo(arbol, padre_nui=None)
 
         print("\nArbol creado con exito\n")
+
+        session.close()
 
         return

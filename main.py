@@ -16,7 +16,11 @@ listaExpresiones = [
     "a?(b?)?a+",
     "0?(1?)?0+",
     "(a|b)*((a|b)|ε)*",
-    "(a|b)*((a|(bb)*)ε)"
+    "(a|b)*((a|(bb)*)ε)",
+    "(a|ε)b(a+)c?",
+    "(b|b)*abb(a|b)*",
+    "(a|b)*a(a|b)(a|b)",
+    "(ab)?a|b"
 ]
 
 
@@ -49,6 +53,8 @@ def crearAFDdesdeAFN(expresion, mostrarPrimitivos=False):
 
     regex = convertirAPostfix(regex)
 
+    # print(regex)
+
     # Creamos el automata finito no determinista utilizando Thompson, posteriormente lo convertimos a grafo con Neo4J
 
     AFN_Thompson = Thompson(regex).afn
@@ -80,7 +86,7 @@ def crearAFDmetodoDirecto(expresion):
 
     directo = Directo(expresionRegularExpandida=regexExpandida)
 
-    afd = directo.afd
+    # Obtenemos el arbol sintactico de la expresion regular para poder ilustrarlo
 
     arbol = directo.arbol
 
@@ -89,7 +95,7 @@ def crearAFDmetodoDirecto(expresion):
 
 if __name__ == "__main__":
 
-    expresionAUtilizar = listaExpresiones[3]
+    expresionAUtilizar = listaExpresiones[0]
 
     # Crear un AFN utilizando Thompson e ilustrarlo con Neo4J:
 
@@ -100,9 +106,5 @@ if __name__ == "__main__":
     # crearAFDdesdeAFN(expresionAUtilizar)
 
     # Crear un AFD utilizando el metodo directo e ilustrarlo con Neo4J:
-
-    # for ex in listaExpresiones:
-
-    #     crearAFDmetodoDirecto(ex)
 
     crearAFDmetodoDirecto(expresionAUtilizar)
