@@ -1,0 +1,15 @@
+digraph {
+	graph [rankdir=LR]
+	D -> B [label=a]
+	D -> A [label=b]
+	A -> B [label=a]
+	A -> A [label=b]
+	B -> B [label=a]
+	B -> C [label=b]
+	C -> B [label=a]
+	C -> D [label=b]
+	A [shape=circle style=bold]
+	Inicio [shape=point]
+	Inicio -> A
+	D [shape=doublecircle style=bold]
+}

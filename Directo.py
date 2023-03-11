@@ -37,7 +37,7 @@ class Nodo:
 
     def __str__(self):
 
-        return str(self.valor) + " -> " + str(self.numeroUnicoIdentificacion)
+        return str(self.valor)
 
 
 class Directo:
@@ -230,28 +230,6 @@ class Directo:
                 return self.calcularLastPos(nodo.izquierda)
             else:
                 return self.calcularLastPos(nodo.derecha)
-
-    def calcularFollowPos(self, nodo):
-
-        if nodo is None:
-            return
-
-        # Si  n  es  un  nodo  de  concatenación  con  hijo izquierdo  c1  e  hijo  derecho  c2
-        # para  cada  última posición de c1, todas las primeras posiciones de c2 se encuentran en última posición.
-
-        if nodo.valor == ".":
-            for i in self.calcularLastPos(nodo.izquierda):
-                self.afd.estados[i].followPos += self.calcularFirstPos(
-                    nodo.derecha)
-
-        # Si n es un nodo de clausura de Kleene con un hijo
-        # c,  todas  las  primeras  posiciones  de  c  se
-        # encuentran en cada última posición de c.
-
-        if nodo.valor == "*":
-            for i in self.calcularLastPos(nodo.izquierda):
-                self.afd.estados[i].followPos += self.calcularFirstPos(
-                    nodo.izquierda)
 
     def crearAFDdesdeArbol(self):
 

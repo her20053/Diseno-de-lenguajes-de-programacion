@@ -3,7 +3,7 @@ from neo4j import GraphDatabase
 
 class Ilustrador:
 
-    def dibujarAFD(afd, mostrarPrimitivos):
+    def dibujarAFD(afd, mostrarPrimitivos=False):
 
         # Creamos el driver para la conexion con Neo4J
 
@@ -136,7 +136,6 @@ class Ilustrador:
         def dibujarNodo(arbol, padre_nui=None):
 
             # Creamos el nodo actual
-
             session.run(
                 f'''
                 CREATE (n:Node {{name: "{arbol.valor}", 
@@ -144,7 +143,8 @@ class Ilustrador:
                 Asignado: "{arbol.numeracionSimbolica}",
                 Anulable: "{arbol.anulable}",
                 firstPos: "{str(arbol.firstpos)}",
-                lastPos_: "{str(arbol.lastpos)}"}})
+                lastPos: "{str(arbol.lastpos)}",
+                followPos: "{str(arbol.followpos)}"}})
                 ''')
 
             # Creamos la relación con el nodo padre, si existe

@@ -32,6 +32,12 @@ class AFN:
 
         return self.transiciones[0].origen
 
+    def getEstadoFinal(self):
+
+        # El estado final de N es el ultimo estado de la lista de transiciones
+
+        return self.transiciones[-1].destino
+
     # Metodo encargado de transformar el AFN a un string
     def __str__(self):
 

@@ -1,0 +1,17 @@
+digraph {
+	graph [rankdir=LR]
+	A -> B [label=a]
+	A -> E [label=b]
+	B -> B [label=a]
+	B -> C [label=b]
+	C -> B [label=a]
+	C -> D [label=b]
+	D -> B [label=a]
+	D -> E [label=b]
+	E -> B [label=a]
+	E -> E [label=b]
+	A [shape=circle style=bold]
+	Inicio [shape=point]
+	Inicio -> A
+	D [shape=doublecircle style=bold]
+}

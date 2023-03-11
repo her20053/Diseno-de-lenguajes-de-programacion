@@ -11,6 +11,8 @@ class AFD:
         self.afd = Tabla
         self.afn = Afn
 
+        self.obtenerTransiciones()
+
     def mostrarTablaAFD(self):
 
         headersTabla = []
@@ -55,6 +57,39 @@ class AFD:
 
         print(tabulate(contenidoTabla, headersTabla, tablefmt="grid"))
 
+    def obtenerTransiciones(self):
+
+        estadosIniciales = []
+
+        estadosAceptacion = []
+
+        diccionarioEstados = {}
+
+        for fila in self.afd:
+
+            diccionarioEstados[str(fila.primitivo)] = str(fila.estadoDelAFD)
+
+        transiciones = []
+
+        for fila in self.afd:
+
+            for k, v in fila.transiciones.items():
+
+                transiciones.append(
+                    (str(fila.estadoDelAFD), k, diccionarioEstados[str(v)]))
+
+                if fila.estadoInicial:
+                    if str(fila.estadoDelAFD) not in estadosIniciales:
+                        estadosIniciales.append(str(fila.estadoDelAFD))
+
+                if fila.estadoAceptacion:
+                    if str(fila.estadoDelAFD) not in estadosAceptacion:
+                        estadosAceptacion.append(str(fila.estadoDelAFD))
+
+        self.transiciones = transiciones
+        self.estadosIniciales = estadosIniciales
+        self.estadosAceptacion = estadosAceptacion
+
 
 class FilaTablaD:
 
@@ -78,7 +113,9 @@ class FilaTablaD:
 
     def __str__(self):
 
-        return str(self.primitivo) + " -> " + str(self.conjuntoDeEstadosAFN) + " -> " + str(self.estadoDelAFD) + " -> " + str(self.transiciones)
+        # return str(self.primitivo) + " -> " + str(self.conjuntoDeEstadosAFN) + " -> " + str(self.estadoDelAFD) + " -> " + str(self.transiciones)
+
+        return "{" + str(self.estadoDelAFD) + "}"
 
     def mostrarTabulateFila(self):
 
