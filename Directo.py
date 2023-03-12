@@ -33,11 +33,62 @@ class Nodo:
 
         # Su conjunto de siguientes:
 
-        self.followpos = None
+        self.followpos = []
 
     def __str__(self):
 
-        return str(self.valor)
+        return self.valor
+
+    def obtenerListaHoja(self):
+
+        contenido_tabla = []
+
+        contenido_tabla.append(str(self.valor))
+        contenido_tabla.append(str(self.numeracionSimbolica))
+        contenido_tabla.append(str(self.anulable))
+        contenido_tabla.append(str(self.firstpos))
+        contenido_tabla.append(str(self.lastpos))
+        contenido_tabla.append(str(self.followpos))
+
+        return contenido_tabla
+
+    def mostrarArbol(self):
+
+        # En post order
+
+        headers = []
+
+        headers.append("Valor")
+        headers.append("Numero")
+        headers.append("Anulable")
+        headers.append("Firstpos")
+        headers.append("Lastpos")
+        headers.append("Followpos")
+
+        contenido = []
+
+        def postOrder(nodo):
+            if nodo is None:
+                return
+            postOrder(nodo.izquierda)
+            postOrder(nodo.derecha)
+            contenido.append(nodo.obtenerListaHoja())
+
+        postOrder(self)
+
+        print(tabulate(contenido, headers, tablefmt="grid"))
+
+
+class AutomataFinitoDeterminista:
+
+    def __init__(self):
+
+        pass
+
+
+class FilaTabla:
+
+    pass
 
 
 class Directo:
@@ -91,6 +142,14 @@ class Directo:
                 pila.append(nodo)
         self.arbol = pila.pop()
 
+    def obtenerSimbolos(self):
+
+        self.simbolosExpresionRegular = []
+
+        for caracter in self.expresionRegular:
+            if caracter not in ["|", ".", "*", "+", "?", "ε", "#"] and caracter not in self.simbolosExpresionRegular:
+                self.simbolosExpresionRegular.append(caracter)
+
     def __init__(self, expresionRegularExpandida):
 
         self.expresionRegular = expresionRegularExpandida
@@ -100,6 +159,12 @@ class Directo:
         self.numeroUnicoNodo = 1
 
         self.numeroPorSimbolo = 1
+
+        self.estadosVisitados = []
+
+        self.transiciones = {}
+
+        self.obtenerSimbolos()
 
         self.construir_arbol(self.expresionRegular)
 
@@ -231,6 +296,161 @@ class Directo:
             else:
                 return self.calcularLastPos(nodo.derecha)
 
+    def calcularFollowPos(self, raiz):
+
+        # Agregamos todos los nodos a una lista de una forma postorder
+
+        listaNodos = []
+
+        def recorridoPostOrder(nodo):
+
+            if nodo is None:
+                return
+
+            recorridoPostOrder(nodo.izquierda)
+            recorridoPostOrder(nodo.derecha)
+
+            listaNodos.append(nodo)
+
+        recorridoPostOrder(raiz)
+
+        for nodo in listaNodos:
+
+            if nodo.valor == ".":
+
+                for i in nodo.izquierda.lastpos:
+
+                    # Buscamos el nodo que tenga el numeroUnicoIdentificacion igual a i
+
+                    for nodo2 in listaNodos:
+
+                        if nodo2.numeracionSimbolica == i:
+
+                            nodo2.followpos += nodo.derecha.firstpos
+
+                    # Ordenamos la lista de followpos
+
+                    for nodo2 in listaNodos:
+
+                        if nodo2.numeracionSimbolica == i:
+
+                            nodo2.followpos = sorted(nodo2.followpos)
+
+                    # Eliminamos los elementos repetidos
+
+                    for nodo2 in listaNodos:
+
+                        if nodo2.numeracionSimbolica == i:
+
+                            nodo2.followpos = list(set(nodo2.followpos))
+
+            if nodo.valor == "*":
+
+                for i in nodo.lastpos:
+
+                    # Agregamos los firstpos del nodo hijo
+
+                    for nodo2 in listaNodos:
+
+                        if nodo2.numeracionSimbolica == i:
+
+                            nodo2.followpos += nodo.firstpos
+
+                    # Ordenamos la lista de followpos
+
+                    for nodo2 in listaNodos:
+
+                        if nodo2.numeracionSimbolica == i:
+
+                            nodo2.followpos = sorted(nodo2.followpos)
+
+                    # Eliminamos los elementos repetidos
+
+                    for nodo2 in listaNodos:
+
+                        if nodo2.numeracionSimbolica == i:
+
+                            nodo2.followpos = list(set(nodo2.followpos))
+
+        # Ahora recorremos el arbol de nuevo para asignarle a cada nodo su followpos de manera postorder
+
+        def recorridoPostOrder(nodo):
+
+            if nodo is None:
+                return
+
+            recorridoPostOrder(nodo.izquierda)
+            recorridoPostOrder(nodo.derecha)
+
+            for i in listaNodos:
+
+                if i.numeroUnicoIdentificacion == nodo.numeroUnicoIdentificacion:
+
+                    nodo.followpos = i.followpos
+
+        recorridoPostOrder(raiz)
+
+        self.listaNodos = listaNodos
+
+        return raiz
+
+    def asignarEstado(self, estado):
+
+        nuevo_estado = tuple(estado)
+
+        if nuevo_estado in self.estadosVisitados:
+
+            return
+
+        self.estadosVisitados.append(nuevo_estado)
+
+        diccionarioTemporal = {}
+
+        for simbolo in self.simbolosExpresionRegular:
+
+            diccionarioTemporal[simbolo] = []
+
+            for numero in estado:
+
+                for nodo in self.listaNodos:
+
+                    if nodo.numeracionSimbolica == numero:
+
+                        if nodo.valor == simbolo:
+
+                            diccionarioTemporal[simbolo].extend(nodo.followpos)
+
+                            diccionarioTemporal[simbolo] = sorted(
+                                diccionarioTemporal[simbolo])
+
+                            diccionarioTemporal[simbolo] = list(
+                                set(diccionarioTemporal[simbolo]))
+
+                self.asignarEstado(diccionarioTemporal[simbolo])
+
+        self.transiciones[tuple(estado)] = diccionarioTemporal
+
+    def crearAFDRecursivo(self):
+
+        # El estado inicial de D es primera posición de la raíz del árbol sintáctico.
+
+        PosicionInicial = self.arbol.firstpos
+
+        # print(self.simbolosExpresionRegular)
+
+        self.asignarEstado(PosicionInicial)
+
+        self.transiciones = dict(list(self.transiciones.items())[::-1])
+
+        self.transiciones = {k: v for k,
+                             v in self.transiciones.items() if k != ()}
+
+        # self.transiciones:
+        # (1, 2, 3) {'a': [1, 2, 3, 4], 'b': [1, 2, 3]}
+        # (1, 2, 3, 4) {'a': [1, 2, 3, 4], 'b': [1, 2, 3, 5]}
+        # (1, 2, 3, 5) {'a': [1, 2, 3, 4], 'b': [1, 2, 3, 6]}
+        # (1, 2, 3, 6) {'a': [1, 2, 3, 4], 'b': [1, 2, 3]}
+
     def crearAFDdesdeArbol(self):
 
         # Siguiendo los pasos de la presentacion, tenemos que asignarle un numero a cada simbolo (NO OPERADOR) del arbol
@@ -291,3 +511,7 @@ class Directo:
         recorridoPostOrder(self.arbol)
 
         # El siguiente paso es calcular su conjunto de siguientes posiciones 'followpos':
+
+        self.calcularFollowPos(self.arbol)
+
+        self.crearAFDRecursivo()

@@ -136,7 +136,11 @@ def crearAFDmetodoDirecto(expresion):
 
     arbol = directo.arbol
 
-    Ilustrador.IlustrarArbolPostOrder(arbol, arbol.numeroUnicoIdentificacion)
+    # Recorrido postorder del arbol
+
+    # arbol.mostrarArbol()
+
+    # Ilustrador.IlustrarArbolPostOrder(arbol, arbol.numeroUnicoIdentificacion)
 
 
 def crearAFDMinimizado(afd):
@@ -179,11 +183,11 @@ if __name__ == "__main__":
     # ---------------------------------------------------------------------------------------
     # Crear un AFD utilizando el metodo directo:
 
-    # crearAFDmetodoDirecto(expresionAUtilizar)
+    crearAFDmetodoDirecto(expresionAUtilizar)
     # ---------------------------------------------------------------------------------------
     # Minimizar un AFD generado con Subconjuntos:
 
-    afd_minimizado = crearAFDMinimizado(afdDesdeafn(expresionAUtilizar).afd)
+    # afd_minimizado = crearAFDMinimizado(afdDesdeafn(expresionAUtilizar).afd)
 
-    resultadoSimulacion = simularAFD(afd_minimizado.transiciones, cadena)
+    # resultadoSimulacion = simularAFD(afd_minimizado.transiciones, cadena)
     # ---------------------------------------------------------------------------------------
