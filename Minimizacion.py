@@ -172,6 +172,7 @@ def obtenerIndiceEstado(estado):
 
 def create_combination_lists(dictionary):
     result = {}
+    print(dictionary)
     for key, values in dictionary.items():
         value_lists = []
         for value in values.values():

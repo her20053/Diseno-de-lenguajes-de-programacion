@@ -1,4 +1,5 @@
 from tabulate import tabulate
+import string
 
 
 class Nodo:
@@ -79,16 +80,145 @@ class Nodo:
         print(tabulate(contenido, headers, tablefmt="grid"))
 
 
-class AutomataFinitoDeterminista:
+class AFD:
 
-    def __init__(self):
+    def __init__(self, Tabla):
 
-        pass
+        self.afd = Tabla
+
+        self.obtenerTransiciones()
+
+    def mostrarTablaAFD(self):
+
+        headersTabla = []
+
+        contenidoTabla = []
+
+        headersTabla.append("Primitivo")
+
+        headersTabla.append("Conjunto de estados AFN")
+
+        headersTabla.append("Estado del AFD")
+
+        headersTabla.append("Aceptacion")
+
+        headersTabla.append("Inicial")
+
+        for fila in self.afd:
+
+            temporal = []
+
+            temporal.append(fila.primitivo)
+
+            temporal.append(fila.conjuntoDeEstadosAFN)
+
+            temporal.append(fila.estadoDelAFD)
+
+            temporal.append(fila.estadoAceptacion)
+
+            temporal.append(fila.estadoInicial)
+
+            for k, v in fila.transiciones.items():
+
+                temporal.append(v)
+
+                stringTemporal = "Transicion con " + str(k)
+
+                if stringTemporal not in headersTabla:
+
+                    headersTabla.append(stringTemporal)
+
+            contenidoTabla.append(temporal)
+
+        print(tabulate(contenidoTabla, headersTabla, tablefmt="grid"))
+
+    def obtenerTransiciones(self):
+
+        estadosIniciales = []
+
+        estadosAceptacion = []
+
+        diccionarioEstados = {}
+
+        for fila in self.afd:
+
+            diccionarioEstados[str(fila.primitivo)] = str(fila.estadoDelAFD)
+
+        transiciones = []
+
+        for fila in self.afd:
+
+            for k, v in fila.transiciones.items():
+
+                transiciones.append(
+                    (str(fila.estadoDelAFD), k, diccionarioEstados[str(tuple(v))]))
+
+                if fila.estadoInicial:
+                    if str(fila.estadoDelAFD) not in estadosIniciales:
+                        estadosIniciales.append(str(fila.estadoDelAFD))
+
+                if fila.estadoAceptacion:
+                    if str(fila.estadoDelAFD) not in estadosAceptacion:
+                        estadosAceptacion.append(str(fila.estadoDelAFD))
+
+        self.transiciones = transiciones
+        self.estadosIniciales = estadosIniciales
+        self.estadosAceptacion = estadosAceptacion
 
 
-class FilaTabla:
+class FilaTablaD:
 
-    pass
+    def __init__(self, primitivo, conjuntoDeEstadosAFN, estadoDelAFD):
+
+        self.primitivo = primitivo
+
+        self.conjuntoDeEstadosAFN = conjuntoDeEstadosAFN
+
+        self.estadoDelAFD = estadoDelAFD
+
+        self.transiciones = {}
+
+        self.estadoAceptacion = False
+
+        self.estadoInicial = False
+
+    def agregarTransicion(self, simboloTransicion, estadoDestino):
+
+        self.transiciones[simboloTransicion] = estadoDestino
+
+    def mostrarTabulateFila(self):
+
+        headersTabla = []
+
+        tablaTemporal = []
+
+        tablaTemporal.append(self.primitivo)
+
+        headersTabla.append("Primitivo")
+
+        tablaTemporal.append(self.conjuntoDeEstadosAFN)
+
+        headersTabla.append("Conjunto de estados AFN")
+
+        tablaTemporal.append(self.estadoDelAFD)
+
+        headersTabla.append("Estado del AFD")
+
+        tablaTemporal.append([self.estadoAceptacion])
+
+        headersTabla.append("Aceptacion")
+
+        tablaTemporal.append([self.estadoInicial])
+
+        headersTabla.append("Inicial")
+
+        for k, v in self.transiciones.items():
+
+            tablaTemporal.append(v)
+
+            headersTabla.append("Transicion con " + str(k))
+
+        print(tabulate([tablaTemporal], headersTabla, tablefmt="grid"))
 
 
 class Directo:
@@ -515,3 +645,49 @@ class Directo:
         self.calcularFollowPos(self.arbol)
 
         self.crearAFDRecursivo()
+
+        # print(self.transiciones)
+
+        afd = []
+
+        # Ahora que ya tenemos nuestro AFD, tenemos que crear la tabla D
+
+        # Empezamos asignandole una letra a cada estado
+
+        diccionarioAsignaciones = {}
+
+        letrasAsignadas = 0
+
+        for k, v in self.transiciones.items():
+
+            diccionarioAsignaciones[k] = string.ascii_uppercase[letrasAsignadas]
+
+            letrasAsignadas += 1
+
+        # Una vez hecho esto podemos empezar a hacer las filas y agregarlas al AFD
+
+        for k, v in self.transiciones.items():
+
+            filaTemporal = FilaTablaD(k, [None], diccionarioAsignaciones[k])
+
+            if tuple(self.arbol.firstpos) == k:
+
+                filaTemporal.estadoInicial = True
+
+            for numero in k:
+
+                if numero == self.numeroPorSimbolo - 1:
+
+                    filaTemporal.estadoAceptacion = True
+
+            for simbolo, lista in v.items():
+
+                filaTemporal.transiciones[simbolo] = lista
+
+            afd.append(filaTemporal)
+
+        afd_final = AFD(afd)
+
+        # afd_final.mostrarTablaAFD()
+
+        self.afd = afd_final

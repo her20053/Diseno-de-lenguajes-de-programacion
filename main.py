@@ -134,13 +134,19 @@ def crearAFDmetodoDirecto(expresion):
 
     # Obtenemos el arbol sintactico de la expresion regular para poder ilustrarlo
 
-    arbol = directo.arbol
+    # arbol = directo.arbol
+
+    AFD_Directo = directo.afd
+
+    graficarAutomataFinitoDeterminista(AFD_Directo, "AFD_Directo")
 
     # Recorrido postorder del arbol
 
     # arbol.mostrarArbol()
 
     # Ilustrador.IlustrarArbolPostOrder(arbol, arbol.numeroUnicoIdentificacion)
+
+    return AFD_Directo
 
 
 def crearAFDMinimizado(afd):
@@ -183,9 +189,9 @@ if __name__ == "__main__":
     # ---------------------------------------------------------------------------------------
     # Crear un AFD utilizando el metodo directo:
 
-    crearAFDmetodoDirecto(expresionAUtilizar)
+    afd = crearAFDmetodoDirecto(expresionAUtilizar)
     # ---------------------------------------------------------------------------------------
-    # Minimizar un AFD generado con Subconjuntos:
+    # Minimizar un AFD generado con Subconjuntos o Directo:
 
     # afd_minimizado = crearAFDMinimizado(afdDesdeafn(expresionAUtilizar).afd)
 
