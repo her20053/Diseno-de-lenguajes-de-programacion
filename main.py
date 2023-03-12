@@ -167,20 +167,20 @@ if __name__ == "__main__":
     # ---------------------------------------------------------------------------------------
     # Crear un AFN utilizando Thompson
 
-    # afn = crearAFNconThompson(expresionAUtilizar)
+    afn = crearAFNconThompson(expresionAUtilizar)
 
     # # Simularlo con una cadena
 
-    # resultadoSimulacion = simularAFN(afn.transiciones, cadena)
+    resultadoSimulacion = simularAFN(afn.transiciones, cadena)
 
-    # if resultadoSimulacion:
+    if resultadoSimulacion:
 
-    #     print("\nLa cadena '" + cadena + "' es aceptada por el AFN propuesto.\n")
+        print("\nLa cadena '" + cadena + "' es aceptada por el AFN propuesto.\n")
 
     # ---------------------------------------------------------------------------------------
     # Crear un AFD utilizando Thompson luego utilizando Subconjuntos:
 
-    # afd = crearAFDdesdeAFN(expresionAUtilizar)
+    afd = crearAFDdesdeAFN(expresionAUtilizar)
 
     # Simularlo con una cadena
 
@@ -193,7 +193,7 @@ if __name__ == "__main__":
     # ---------------------------------------------------------------------------------------
     # Minimizar un AFD generado con Subconjuntos o Directo:
 
-    # afd_minimizado = crearAFDMinimizado(afdDesdeafn(expresionAUtilizar).afd)
+    afd_minimizado = crearAFDMinimizado(afdDesdeafn(expresionAUtilizar).afd)
 
     # resultadoSimulacion = simularAFD(afd_minimizado.transiciones, cadena)
     # ---------------------------------------------------------------------------------------
