@@ -5,7 +5,7 @@ from Subconjuntos import Subconjuntos
 
 from Minimizacion import minimizarAFD
 from Simulacion import simularAFN, simularAFD
-from Postfix import convertirAPostfix, formatearExpresionRegular
+from Postfix import convertirAPostfix, formatearExpresionRegular, transformarAIdentidad
 from Graficador import graficarAutomataFinitoNoDeterminista, graficarAutomataFinitoDeterminista
 
 listaExpresiones = [
@@ -25,7 +25,7 @@ listaExpresiones = [
     "(b|b)*abb(a|b)*",
     "(a|b)*a(a|b)(a|b)",
     "(ab)?a|b",
-    "((ab)+|c)?"
+    "(a|b)a"
 ]
 
 
@@ -43,11 +43,13 @@ def crearAFNconThompson(expresion):
 
     # Creamos el automata finito no determinista utilizando Thompson, posteriormente lo convertimos a grafo con Neo4J
 
-    # AFN_Thompson = Thompson(regex).crearGrafoNeo4J()
-
     AFN_Thompson = Thompson(regex).afn
 
+    # Graficamos el automata finito no determinista
+
     graficarAutomataFinitoNoDeterminista(AFN_Thompson)
+
+    # Retornamos el automata finito no determinista
 
     return AFN_Thompson
 
@@ -64,8 +66,6 @@ def crearAFDdesdeAFN(expresion):
 
     regex = convertirAPostfix(regex)
 
-    # print(regex)
-
     # Creamos el automata finito no determinista utilizando Thompson, posteriormente lo convertimos a grafo con Neo4J
 
     AFN_Thompson = Thompson(regex).afn
@@ -74,15 +74,11 @@ def crearAFDdesdeAFN(expresion):
 
     AFD_Subconjuntos = Subconjuntos(AFN_Thompson).afd
 
-    # if mostrarTablaAFD:
-
-    # AFD_Subconjuntos.mostrarTablaAFD()
-
-    # if ilustrarAFD:
-
-    #     Ilustrador.dibujarAFD(AFD_Subconjuntos)
+    # Graficamos el automata finito determinista
 
     graficarAutomataFinitoDeterminista(AFD_Subconjuntos, "AFD_Subconjuntos")
+
+    # Retornamos el automata finito determinista
 
     return AFD_Subconjuntos
 
@@ -99,8 +95,6 @@ def afdDesdeafn(expresion):
 
     regex = convertirAPostfix(regex)
 
-    # print(regex)
-
     # Creamos el automata finito no determinista utilizando Thompson, posteriormente lo convertimos a grafo con Neo4J
 
     AFN_Thompson = Thompson(regex).afn
@@ -109,12 +103,14 @@ def afdDesdeafn(expresion):
 
     AFD_Subconjuntos = Subconjuntos(AFN_Thompson).afd
 
-    # AFD_Subconjuntos.mostrarTablaAFD()
+    # Retornamos el automata finito determinista
 
     return AFD_Subconjuntos
 
 
 def crearAFDmetodoDirecto(expresion):
+
+    # Para elaborar el AFD directo, se debe expandir la expresion regular
 
     def expandirRegex(regex):
 
@@ -124,76 +120,101 @@ def crearAFDmetodoDirecto(expresion):
 
     regex = formatearExpresionRegular(expresion)
 
+    # Convertimos la expresion regular a su forma identidad
+
+    regex = transformarAIdentidad(regex)
+
     # Convertimos la expresion regular de infix a postfix
 
     regex = convertirAPostfix(regex)
 
     regexExpandida = expandirRegex(regex)
 
-    directo = Directo(expresionRegularExpandida=regexExpandida)
+    directo = Directo(regexExpandida)
 
-    # Obtenemos el arbol sintactico de la expresion regular para poder ilustrarlo
-
-    # arbol = directo.arbol
+    # Obtenemos el afd directo
 
     AFD_Directo = directo.afd
 
+    print(directo.arbol)
+
+    # Graficamos el automata finito determinista
+
     graficarAutomataFinitoDeterminista(AFD_Directo, "AFD_Directo")
 
-    # Recorrido postorder del arbol
-
-    # arbol.mostrarArbol()
-
-    # Ilustrador.IlustrarArbolPostOrder(arbol, arbol.numeroUnicoIdentificacion)
+    # Retornamos el automata finito determinista
 
     return AFD_Directo
 
 
 def crearAFDMinimizado(afd):
 
+    # Minimizamos el AFD
+
     afd_minimizado = minimizarAFD(afd)
 
+    # Graficamos el automata finito determinista minimizado
+
     graficarAutomataFinitoDeterminista(afd_minimizado, "AFD Minimizado")
+
+    # Retornamos el automata finito determinista minimizado
 
     return afd_minimizado
 
 
 if __name__ == "__main__":
 
-    expresionAUtilizar = listaExpresiones[0]
+    expresionAUtilizar = listaExpresiones[-1]
 
     cadena = "abababbbbabb"
 
     # ---------------------------------------------------------------------------------------
     # Crear un AFN utilizando Thompson
 
-    afn = crearAFNconThompson(expresionAUtilizar)
-
-    # # Simularlo con una cadena
-
-    resultadoSimulacion = simularAFN(afn.transiciones, cadena)
-
-    if resultadoSimulacion:
-
-        print("\nLa cadena '" + cadena + "' es aceptada por el AFN propuesto.\n")
-
-    # ---------------------------------------------------------------------------------------
-    # Crear un AFD utilizando Thompson luego utilizando Subconjuntos:
-
-    afd = crearAFDdesdeAFN(expresionAUtilizar)
+    # afn = crearAFNconThompson(expresionAUtilizar)
 
     # Simularlo con una cadena
 
-    # resultadoSimulacion = simularAFD(afd.transiciones, cadena)
+    # resultadoSimulacion = simularAFN(afn.transiciones, cadena)
+
+    # if resultadoSimulacion:
+
+    #     print("\nLa cadena '" + cadena + "' es aceptada por el AFN propuesto.\n")
 
     # ---------------------------------------------------------------------------------------
     # Crear un AFD utilizando el metodo directo:
 
-    afd = crearAFDmetodoDirecto(expresionAUtilizar)
+    # afd = crearAFDmetodoDirecto(expresionAUtilizar)
+
+    # ---------------------------------------------------------------------------------------
+    # Crear un AFD utilizando Thompson luego utilizando Subconjuntos:
+
+    # afd = crearAFDdesdeAFN(expresionAUtilizar)
+
     # ---------------------------------------------------------------------------------------
     # Minimizar un AFD generado con Subconjuntos o Directo:
 
-    afd_minimizado = crearAFDMinimizado(afdDesdeafn(expresionAUtilizar).afd)
+    # afd_minimizado = crearAFDMinimizado(afdDesdeafn(expresionAUtilizar).afd)
 
     # resultadoSimulacion = simularAFD(afd_minimizado.transiciones, cadena)
     # ---------------------------------------------------------------------------------------
+
+    for expresion in listaExpresiones:
+
+        print("\nLa expresion regular a utilizar es: " + expresion + "\n")
+
+        # + Por medio de Thompson:
+
+        # afn = crearAFNconThompson(expresion)
+
+        # + Por medio de Subconjuntos:
+
+        # afd = crearAFDdesdeAFN(expresion)
+
+        # + Por medio de Directo:
+
+        afd = crearAFDmetodoDirecto(expresion)
+
+        # + Minimizar AFD generado con Subconjuntos:
+
+        # afd = crearAFDMinimizado(afdDesdeafn(expresion).afd)

@@ -74,3 +74,36 @@ def convertirAPostfix(expresion):
         postfix.append(stack.pop())
 
     return "".join(postfix)
+
+
+def transformarAIdentidad(expresion):
+    # modificamos el regex para que no tenga ?
+    if '?' in expresion:
+        expresion = expresion.replace('?', '|ε')
+        expresion = expresion.replace('.|ε', '|ε.')
+        parts = expresion.split('.')
+        for i in range(len(parts)):
+            if '|ε' in parts[i]:
+                parts[i] = f"({parts[i]})"
+        expresion = ".".join(parts)
+
+    # modificamos el regex para que no tenga +
+    if '+' in expresion:
+        parts = expresion.split('.')
+        new_parts = []
+        for i, part in enumerate(parts):
+            if '+' in part:
+                if '(' in part and ')' in part and part.index('(') < part.index('+') < part.index(')'):
+                    subparts = part[part.index(
+                        '(') + 1:part.index(')')].split('+')
+                    new_part = f"({subparts[0]}.{subparts[0]}*)"
+                    new_parts.append(new_part)
+                else:
+                    subparts = part.split('+')
+                    new_part = f"{subparts[0]}.{subparts[0]}*"
+                    new_parts.append(new_part)
+            else:
+                new_parts.append(part)
+        expresion = ".".join(new_parts)
+
+    return expresion

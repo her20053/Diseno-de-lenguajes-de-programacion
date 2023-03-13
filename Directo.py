@@ -148,7 +148,15 @@ class AFD:
 
         for fila in self.afd:
 
+            # print("Fila: \n", fila.transiciones.items())
+
             for k, v in fila.transiciones.items():
+
+                # print("Valores k, v: \n", k, v)
+
+                if len(v) == 0:
+
+                    continue
 
                 transiciones.append(
                     (str(fila.estadoDelAFD), k, diccionarioEstados[str(tuple(v))]))
@@ -566,8 +574,6 @@ class Directo:
 
         PosicionInicial = self.arbol.firstpos
 
-        # print(self.simbolosExpresionRegular)
-
         self.asignarEstado(PosicionInicial)
 
         self.transiciones = dict(list(self.transiciones.items())[::-1])
@@ -645,8 +651,6 @@ class Directo:
         self.calcularFollowPos(self.arbol)
 
         self.crearAFDRecursivo()
-
-        # print(self.transiciones)
 
         afd = []
 
