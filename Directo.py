@@ -148,11 +148,7 @@ class AFD:
 
         for fila in self.afd:
 
-            # print("Fila: \n", fila.transiciones.items())
-
             for k, v in fila.transiciones.items():
-
-                # print("Valores k, v: \n", k, v)
 
                 if len(v) == 0:
 
@@ -533,7 +529,6 @@ class Directo:
         return raiz
 
     def asignarEstado(self, estado):
-
         nuevo_estado = tuple(estado)
 
         if nuevo_estado in self.estadosVisitados:

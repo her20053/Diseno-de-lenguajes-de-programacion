@@ -136,8 +136,6 @@ def crearAFDmetodoDirecto(expresion):
 
     AFD_Directo = directo.afd
 
-    print(directo.arbol)
-
     # Graficamos el automata finito determinista
 
     graficarAutomataFinitoDeterminista(AFD_Directo, "AFD_Directo")
@@ -164,7 +162,7 @@ def crearAFDMinimizado(afd):
 
 if __name__ == "__main__":
 
-    expresionAUtilizar = listaExpresiones[-1]
+    expresionAUtilizar = listaExpresiones[6]
 
     cadena = "abababbbbabb"
 
@@ -199,22 +197,26 @@ if __name__ == "__main__":
     # resultadoSimulacion = simularAFD(afd_minimizado.transiciones, cadena)
     # ---------------------------------------------------------------------------------------
 
-    for expresion in listaExpresiones:
+    # for expresion in listaExpresiones:
 
-        print("\nLa expresion regular a utilizar es: " + expresion + "\n")
+    #     print("\nLa expresion regular a utilizar es: " + expresion + "\n")
 
-        # + Por medio de Thompson:
+    #     # + Por medio de Thompson:
 
-        # afn = crearAFNconThompson(expresion)
+    #     # afn = crearAFNconThompson(expresion)
 
-        # + Por medio de Subconjuntos:
+    #     # + Por medio de Subconjuntos:
 
-        # afd = crearAFDdesdeAFN(expresion)
+    #     # afd = crearAFDdesdeAFN(expresion)
 
-        # + Por medio de Directo:
+    #     # + Por medio de Directo:
 
-        afd = crearAFDmetodoDirecto(expresion)
+    #     afd = crearAFDmetodoDirecto(expresion)
 
-        # + Minimizar AFD generado con Subconjuntos:
+    #     input("Presiona enter para continuar...")
 
-        # afd = crearAFDMinimizado(afdDesdeafn(expresion).afd)
+    #     # + Minimizar AFD generado con Subconjuntos:
+
+    #     # afd = crearAFDMinimizado(afdDesdeafn(expresion).afd)
+
+    afd = crearAFDmetodoDirecto(expresionAUtilizar)
